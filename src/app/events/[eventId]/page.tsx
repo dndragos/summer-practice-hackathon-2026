@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { Container, Typography, Paper, Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, Chip } from "@mui/material";
+import { Container, Typography, Paper, Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, Chip, Grid } from "@mui/material";
 import VenueSuggestions from "./VenueSuggestions";
+import Chat from "@/components/Chat";
 import { Star as CaptainIcon } from "@mui/icons-material";
 
 export default async function EventDetailsPage({ params }: { params: { eventId: string } }) {
@@ -25,7 +26,15 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
               user: true
             }
           },
-          captain: true
+          captain: true,
+          messages: {
+            include: {
+              sender: {
+                select: { id: true, name: true, image: true }
+              }
+            },
+            orderBy: { createdAt: 'asc' }
+          }
         }
       }
     }
@@ -44,7 +53,7 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
   const isCaptain = group?.captainId === session.user.id;
 
   return (
-    <Container maxWidth="md" sx={{ mt: 6, mb: 6 }}>
+    <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
       <Paper elevation={3} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
         <Typography variant="h3" gutterBottom fontWeight="bold">
           {event.title}
@@ -66,37 +75,53 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
 
         <Divider sx={{ my: 4 }} />
 
-        <Typography variant="h5" gutterBottom fontWeight="bold">
-          Team Roster
-        </Typography>
-        <List sx={{ mb: 4 }}>
-          {group?.members.map(member => {
-            const isMemberCaptain = member.userId === group.captainId;
-            return (
-              <ListItem key={member.id} sx={{ bgcolor: isMemberCaptain ? '#fff8e1' : 'transparent', borderRadius: 2, mb: 1 }}>
-                <ListItemAvatar>
-                  <Avatar src={member.user.image || ""} alt={member.user.name || "User Avatar"} />
-                </ListItemAvatar>
-                <ListItemText 
-                  primary={
-                    <Typography fontWeight={isMemberCaptain ? "bold" : "normal"}>
-                      {member.user.name || "Unknown Athlete"}
-                    </Typography>
-                  } 
-                  secondary={isMemberCaptain ? "Team Captain" : "Player"} 
-                />
-                {isMemberCaptain && <CaptainIcon color="warning" fontSize="large" />}
-              </ListItem>
-            );
-          })}
-        </List>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h5" gutterBottom fontWeight="bold">
+              Team Roster
+            </Typography>
+            <List sx={{ mb: 4 }}>
+              {group?.members.map(member => {
+                const isMemberCaptain = member.userId === group.captainId;
+                return (
+                  <ListItem key={member.id} sx={{ bgcolor: isMemberCaptain ? '#fff8e1' : 'transparent', borderRadius: 2, mb: 1 }}>
+                    <ListItemAvatar>
+                      <Avatar src={member.user.image || ""} alt={member.user.name || "User Avatar"} />
+                    </ListItemAvatar>
+                    <ListItemText 
+                      primary={
+                        <Typography fontWeight={isMemberCaptain ? "bold" : "normal"}>
+                          {member.user.name || "Unknown Athlete"}
+                        </Typography>
+                      } 
+                      secondary={isMemberCaptain ? "Team Captain" : "Player"} 
+                    />
+                    {isMemberCaptain && <CaptainIcon color="warning" fontSize="large" />}
+                  </ListItem>
+                );
+              })}
+            </List>
 
-        {isCaptain && (
-          <>
-            <Divider sx={{ my: 4 }} />
-            <VenueSuggestions eventId={event.id} sportName={event.sportName} />
-          </>
-        )}
+            {isCaptain && (
+              <Box sx={{ mt: 2 }}>
+                <Divider sx={{ my: 3 }} />
+                <Typography variant="h5" gutterBottom fontWeight="bold">
+                  Captain Controls
+                </Typography>
+                <VenueSuggestions eventId={event.id} sportName={event.sportName} />
+              </Box>
+            )}
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Chat 
+              groupId={group?.id || ""} 
+              initialMessages={group?.messages || []} 
+              currentUserId={session.user.id} 
+            />
+          </Grid>
+        </Grid>
+
       </Paper>
     </Container>
   );

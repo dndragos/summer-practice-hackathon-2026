@@ -1,7 +1,20 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from '@/theme';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider>
+      <AppRouterCacheProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </AppRouterCacheProvider>
+    </SessionProvider>
+  );
 }
