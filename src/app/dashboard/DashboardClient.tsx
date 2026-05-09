@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toggleAvailability } from "@/app/actions/dashboardActions";
 import { generateMatches } from "@/app/actions/matchmakingActions";
-import { Button, Typography, Paper, Box, CircularProgress, Divider, Stack, Chip } from "@mui/material";
+import { Button, Typography, Paper, Box, CircularProgress, Divider, Stack, Chip, Snackbar, Alert } from "@mui/material";
 import Link from "next/link";
 
 type EventPreview = {
@@ -26,6 +27,18 @@ export default function DashboardClient({
   const [available, setAvailable] = useState(initialAvailable);
   const [loading, setLoading] = useState(false);
   const [matchLoading, setMatchLoading] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams.get("saved") === "1") {
+      setShowSaved(true);
+      // Clean the ?saved=1 from the URL without reloading
+      router.replace("/dashboard", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const handleToggle = async () => {
     setLoading(true);
@@ -117,14 +130,14 @@ export default function DashboardClient({
           <Stack spacing={1.5}>
             {upcomingEvents.map((event) => (
               <Paper key={event.id} variant="outlined" sx={{ p: 2 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
                   <Box>
                     <Typography fontWeight="bold">{event.title}</Typography>
                     <Typography color="text.secondary" variant="body2">
                       {new Date(event.scheduledTime).toLocaleString()} - {event.locationName}
                     </Typography>
                   </Box>
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                     <Chip size="small" label={event.sportName} color="secondary" />
                     <Button component={Link} href={`/events/${event.id}`} variant="outlined" size="small">
                       Open
@@ -150,6 +163,21 @@ export default function DashboardClient({
           {matchLoading ? <CircularProgress size={24} /> : "Trigger Matchmaking"}
         </Button>
       </Box>
+      <Snackbar
+        open={showSaved}
+        autoHideDuration={4000}
+        onClose={() => setShowSaved(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowSaved(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%", borderRadius: 2, fontWeight: "bold" }}
+        >
+          ✅ Profile saved successfully!
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 }

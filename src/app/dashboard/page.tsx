@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import DashboardClient from "./DashboardClient";
 
 export default async function DashboardPage() {
@@ -40,11 +41,13 @@ export default async function DashboardPage() {
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-      <DashboardClient
-        initialAvailable={user.availableToday}
-        userName={user.name}
-        upcomingEvents={upcomingEvents}
-      />
+      <Suspense fallback={null}>
+        <DashboardClient
+          initialAvailable={user.availableToday}
+          userName={user.name}
+          upcomingEvents={upcomingEvents}
+        />
+      </Suspense>
     </div>
   );
 }

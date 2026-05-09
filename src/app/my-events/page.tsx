@@ -42,7 +42,7 @@ export default async function MyEventsPage() {
           <Stack spacing={2}>
             {events.map((event) => (
               <Paper key={event.id} sx={{ p: 3 }}>
-                <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between" }}>
                   <Box>
                     <Typography variant="h6">{event.title}</Typography>
                     <Typography color="text.secondary">{event.locationName}</Typography>

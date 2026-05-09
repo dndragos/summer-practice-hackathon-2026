@@ -7,14 +7,14 @@ import VenueSuggestions from "./VenueSuggestions";
 import Chat from "@/components/Chat";
 import { Star as CaptainIcon } from "@mui/icons-material";
 
-export default async function EventDetailsPage({ params }: { params: { eventId: string } }) {
+export default async function EventDetailsPage({ params }: { params: Promise<{ eventId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     redirect("/api/auth/signin");
   }
 
-  // Fallback to avoid error in case params is a Promise in Next.js 15+
-  const eventId = await Promise.resolve(params.eventId);
+  // In Next.js 15+, params is a Promise and must be awaited
+  const { eventId } = await params;
 
   const event = await prisma.event.findUnique({
     where: { id: eventId },
@@ -83,7 +83,7 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
         <Divider sx={{ my: 4 }} />
 
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="h5" gutterBottom fontWeight="bold">
               Team Roster
             </Typography>
@@ -120,7 +120,7 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
             )}
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Chat 
               groupId={group.id} 
               initialMessages={group.messages || []} 

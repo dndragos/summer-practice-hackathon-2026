@@ -22,6 +22,10 @@ export default function VenueSuggestions({ eventId, sportName }: { eventId: stri
     async function fetchVenues() {
       try {
         const res = await fetch(`/api/venues?sportName=${encodeURIComponent(sportName)}`);
+        if (!res.ok) {
+          console.error("Venues fetch failed with status:", res.status);
+          return;
+        }
         const data = await res.json();
         if (data.results) {
           setVenues(data.results);

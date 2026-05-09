@@ -48,7 +48,15 @@ export default function Chat({ groupId, initialMessages, currentUserId }: ChatPr
         const res = await fetch(`/api/messages?groupId=${encodeURIComponent(groupId)}`, {
           cache: "no-store",
         });
-        if (!res.ok) return;
+
+        // Stop polling on auth errors; don't crash on HTML responses
+        if (!res.ok) {
+          if (res.status === 401) clearTimeout(timerId);
+          return;
+        }
+        const contentType = res.headers.get("content-type") ?? "";
+        if (!contentType.includes("application/json")) return;
+
         const serverMessages = (await res.json()) as Message[];
         
         // Only update if something changed (last message ID or length)

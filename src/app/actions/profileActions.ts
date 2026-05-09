@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function updateProfile(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -15,7 +16,7 @@ export async function updateProfile(formData: FormData) {
   const name = formData.get("name") as string;
   const bio = formData.get("bio") as string;
   const image = formData.get("image") as string;
-  const sportsData = formData.get("sports") as string; // JSON string of sports
+  const sportsData = formData.get("sports") as string;
 
   let sports: { sportName: string; skillLevel: string }[] = [];
   if (sportsData) {
@@ -26,7 +27,6 @@ export async function updateProfile(formData: FormData) {
     }
   }
 
-  // Update User basic info
   await prisma.user.update({
     where: { id: session.user.id },
     data: {
@@ -36,7 +36,6 @@ export async function updateProfile(formData: FormData) {
     },
   });
 
-  // Handle sports preferences
   await prisma.sportPreference.deleteMany({
     where: { userId: session.user.id },
   });
@@ -52,4 +51,6 @@ export async function updateProfile(formData: FormData) {
   }
 
   revalidatePath("/profile");
+  revalidatePath("/dashboard");
+  redirect("/dashboard?saved=1");
 }

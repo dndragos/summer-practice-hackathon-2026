@@ -29,6 +29,10 @@ export default function ProfileClient({ user }: { user: any }) {
         method: "POST",
         body: formData,
       });
+      if (!res.ok) {
+        console.error("Upload failed with status:", res.status);
+        return;
+      }
       const data = await res.json();
       if (data.url) {
         setImageUrl(data.url);
@@ -49,6 +53,15 @@ export default function ProfileClient({ user }: { user: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: rawText }),
       });
+      if (!res.ok) {
+        console.error("AI autofill failed with status:", res.status);
+        return;
+      }
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        console.error("AI autofill: unexpected response type:", contentType);
+        return;
+      }
       const data = await res.json();
       if (Array.isArray(data)) {
         const merged = [...sports, ...data]
