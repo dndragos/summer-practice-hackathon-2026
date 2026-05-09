@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { updateProfile } from "@/app/actions/profileActions";
-import { TextField, Button, Typography, Box, Avatar, IconButton, Paper, Divider, Stack, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
+import { TextField, Button, Typography, Box, Avatar, IconButton, Paper, Divider, Stack, Select, MenuItem, InputLabel, FormControl, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 
 export default function ProfileClient({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
@@ -12,6 +13,8 @@ export default function ProfileClient({ user }: { user: any }) {
   const [sports, setSports] = useState(user.sportPreferences || []);
   const [imageUrl, setImageUrl] = useState(user.image || "");
   const [isUploading, setIsUploading] = useState(false);
+  const [rawText, setRawText] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
   
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -34,6 +37,27 @@ export default function ProfileClient({ user }: { user: any }) {
       console.error("Upload error", error);
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleAiAutofill = async () => {
+    if (!rawText) return;
+    setIsAiLoading(true);
+    try {
+      const res = await fetch("/api/profile/ai-autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: rawText }),
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setSports([...sports, ...data]);
+        setRawText("");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAiLoading(false);
     }
   };
 
@@ -88,6 +112,34 @@ export default function ProfileClient({ user }: { user: any }) {
         <Divider sx={{ my: 3 }} />
 
         <Typography variant="h6" gutterBottom>Sport Preferences</Typography>
+
+        <Paper variant="outlined" sx={{ p: 3, mb: 4, bgcolor: '#f8faff', borderColor: '#d0d7ff' }}>
+          <Typography variant="subtitle1" gutterBottom color="primary" sx={{ fontWeight: 'bold' }}>
+            ✨ AI Auto-Fill Profile
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Just tell us what you like to play and how good you are, and our AI will automatically add the sports for you!
+          </Typography>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="E.g., I like playing hoops and kicking a ball, im pretty good"
+            value={rawText}
+            onChange={(e) => setRawText(e.target.value)}
+            sx={{ mb: 2, bgcolor: 'white' }}
+            multiline
+            rows={2}
+          />
+          <Button 
+            variant="contained" 
+            color="secondary" 
+            startIcon={isAiLoading ? <CircularProgress size={20} color="inherit" /> : <AutoFixHighIcon />}
+            onClick={handleAiAutofill}
+            disabled={isAiLoading || !rawText}
+          >
+            {isAiLoading ? "Processing..." : "Extract Sports"}
+          </Button>
+        </Paper>
         
         {sports.map((sport: any, index: number) => (
           <Stack direction="row" spacing={2} key={index} sx={{ mb: 2 }}>
