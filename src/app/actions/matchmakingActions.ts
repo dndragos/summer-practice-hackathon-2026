@@ -4,12 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 const SPORT_THRESHOLDS: Record<string, number> = {
-  Tennis: 4,
-  Football: 10,
-  Basketball: 10,
-  Volleyball: 12,
-  Baseball: 18,
-  Default: 4, // Fallback
+  Tennis:     2,  // doubles
+  Padel:      2,  // doubles
+  Football:   4,  // mini-pitch / pickup
+  Basketball: 4,  // half-court 2v2
+  Volleyball: 4,  // 2v2 beach
+  Running:    2,  // pair run
+  Swimming:   2,
+  Default:    2,
 };
 
 export async function generateMatches() {
