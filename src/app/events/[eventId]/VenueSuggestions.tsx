@@ -9,6 +9,8 @@ type Venue = {
   name: string;
   address: string;
   rating: number;
+  lat?: number;
+  lng?: number;
 };
 
 export default function VenueSuggestions({ eventId, sportName }: { eventId: string, sportName: string }) {
@@ -33,10 +35,10 @@ export default function VenueSuggestions({ eventId, sportName }: { eventId: stri
     fetchVenues();
   }, [sportName]);
 
-  const handleSelectVenue = async (venueName: string) => {
+  const handleSelectVenue = async (venue: Venue) => {
     setSaving(true);
     try {
-      await updateEventLocation(eventId, venueName);
+      await updateEventLocation(eventId, venue.name, venue.lat, venue.lng);
       alert("Location updated successfully!");
     } catch (error) {
       console.error("Failed to update location", error);
@@ -72,7 +74,7 @@ export default function VenueSuggestions({ eventId, sportName }: { eventId: stri
                 variant="contained" 
                 color="primary" 
                 disabled={saving}
-                onClick={() => handleSelectVenue(venue.name)}
+                onClick={() => handleSelectVenue(venue)}
                 sx={{ borderRadius: 2 }}
               >
                 Select

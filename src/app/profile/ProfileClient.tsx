@@ -51,7 +51,16 @@ export default function ProfileClient({ user }: { user: any }) {
       });
       const data = await res.json();
       if (Array.isArray(data)) {
-        setSports([...sports, ...data]);
+        const merged = [...sports, ...data]
+          .filter((s: any) => s?.sportName && s?.skillLevel)
+          .filter(
+            (sport: any, index: number, arr: any[]) =>
+              arr.findIndex(
+                (item: any) =>
+                  item.sportName.toLowerCase() === sport.sportName.toLowerCase()
+              ) === index
+          );
+        setSports(merged);
         setRawText("");
       }
     } catch (e) {
@@ -175,6 +184,7 @@ export default function ProfileClient({ user }: { user: any }) {
 
         {/* Hidden input to pass sports data as JSON string to the Server Action */}
         <input type="hidden" name="sports" value={JSON.stringify(sports)} />
+        <input type="hidden" name="image" value={imageUrl} />
 
         <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <Button variant="contained" color="primary" type="submit" size="large">

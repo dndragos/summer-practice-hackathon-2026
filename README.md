@@ -256,3 +256,53 @@ The best solutions will make organizing spontaneous sports activities:
 - **frictionless**,
 - **fun**,
 - and **realistic for busy people**.
+
+---
+
+## Local Development Setup
+
+This project is configured to run fully local with SQLite (no Supabase, no Docker, no DB server).
+
+### 1) Configure `.env.local`
+
+Set these values:
+
+- `DATABASE_URL=file:./prisma/dev.db`
+- `NEXTAUTH_SECRET=<any long random string>`
+- `NEXTAUTH_URL=http://localhost:3000`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `GOOGLE_MAPS_API_KEY` (or `PLACES_API_KEY`)
+- `GITHUB_MODELS_API_KEY`
+- optional: `AI_MODEL=openai/gpt-4o-mini`
+
+### 2) Install and initialize DB
+
+Initialize local SQLite schema + seed:
+
+```bash
+npm install
+npm run db:push
+npm run db:seed
+```
+
+### 3) Run app
+
+```bash
+npm run dev
+```
+
+### Common DB errors
+
+If Prisma fails:
+
+1. Verify `DATABASE_URL=file:./prisma/dev.db` in `.env.local`.
+2. Run `npm run db:push` again.
+3. Run `npm run db:seed` again.
+
+## Simulating Chat Locally
+
+1. Open two browser sessions (normal + incognito).
+2. Login with two different emails on `/api/auth/signin` (password is `password` for demo credentials auth).
+3. Ensure both users are in the same event/group (seed creates one).
+4. Open the same event details page in both sessions.
+5. Send messages from one window and verify they appear in the other (chat polls the local API).

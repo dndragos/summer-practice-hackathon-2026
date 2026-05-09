@@ -14,7 +14,14 @@ export function Navbar() {
   const { data: session, status } = useSession();
 
   return (
-    <AppBar position="static" color="primary" sx={{ mb: 4 }}>
+    <AppBar
+      position="sticky"
+      color="primary"
+      sx={{
+        mb: 4,
+        background: "linear-gradient(90deg, #c86b2d 0%, #e09c64 100%)",
+      }}
+    >
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
           <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -26,8 +33,14 @@ export function Navbar() {
           <Button color="inherit" component={Link} href="/dashboard">
             Dashboard
           </Button>
+          <Button color="inherit" component={Link} href="/events/new">
+            New Event
+          </Button>
           <Button color="inherit" component={Link} href="/my-events">
             My Events
+          </Button>
+          <Button color="inherit" component={Link} href="/profile">
+            Profile
           </Button>
 
           {status === "loading" ? (

@@ -50,6 +50,13 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
 
   // Assuming one group per event for auto-generated matches
   const group = event.groups[0];
+  if (!group) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Typography variant="h4">Event has no group yet.</Typography>
+      </Container>
+    );
+  }
   const isCaptain = group?.captainId === session.user.id;
 
   return (
@@ -115,8 +122,8 @@ export default async function EventDetailsPage({ params }: { params: { eventId: 
 
           <Grid item xs={12} md={6}>
             <Chat 
-              groupId={group?.id || ""} 
-              initialMessages={group?.messages || []} 
+              groupId={group.id} 
+              initialMessages={group.messages || []} 
               currentUserId={session.user.id} 
             />
           </Grid>

@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model User {
@@ -26,6 +26,8 @@ model User {
   groupsCaptain    Group[]           @relation("CaptainGroups")
   groupMemberships GroupMember[]
   messagesSent     Message[]
+
+  @@index([availableToday])
 }
 
 model SportPreference {
@@ -49,6 +51,8 @@ model Event {
   createdAt     DateTime @default(now())
   
   groups        Group[]
+
+  @@index([scheduledTime])
 }
 
 model Group {
@@ -73,6 +77,7 @@ model GroupMember {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
+  @@index([userId])
 }
 
 model Message {
@@ -84,4 +89,6 @@ model Message {
 
   group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
 }

@@ -15,34 +15,47 @@ export const authOptions = {
         email: { label: "Email", type: "email", placeholder: "test@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials: any) {
+        console.log("Auth attempt for:", credentials?.email);
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials");
           return null;
         }
 
         if (credentials.password !== "password") {
+          console.log("Invalid password");
           return null;
         }
 
-        // Find or create user
-        let user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email: credentials.email,
-              name: credentials.email.split("@")[0],
-            },
+        try {
+          // Find or create user
+          let user = await prisma.user.findUnique({
+            where: { email: credentials.email },
           });
-        }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
+          if (!user) {
+            console.log("Creating new user for:", credentials.email);
+            user = await prisma.user.create({
+              data: {
+                email: credentials.email,
+                name: credentials.email.split("@")[0],
+              },
+            });
+            console.log("User created with ID:", user.id);
+          } else {
+            console.log("Existing user found with ID:", user.id);
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          };
+        } catch (error) {
+          console.error("Database error during authorize:", error);
+          return null;
+        }
       },
     }),
   ],

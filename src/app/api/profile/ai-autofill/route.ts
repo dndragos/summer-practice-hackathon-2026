@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.GITHUB_MODELS_API_KEY || process.env.OPENAI_API_KEY,
+  baseURL: process.env.AI_BASE_URL || "https://models.github.ai/inference",
 });
 
 export async function POST(request: Request) {
@@ -24,7 +25,7 @@ Raw Text:
 `;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: process.env.AI_MODEL || "openai/gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       temperature: 0,
     });

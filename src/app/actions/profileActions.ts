@@ -14,6 +14,7 @@ export async function updateProfile(formData: FormData) {
 
   const name = formData.get("name") as string;
   const bio = formData.get("bio") as string;
+  const image = formData.get("image") as string;
   const sportsData = formData.get("sports") as string; // JSON string of sports
 
   let sports: { sportName: string; skillLevel: string }[] = [];
@@ -31,21 +32,20 @@ export async function updateProfile(formData: FormData) {
     data: {
       name,
       bio,
+      image: image || null,
     },
   });
 
   // Handle sports preferences
-  if (sports.length > 0) {
-    // First delete existing preferences for this user
-    await prisma.sportPreference.deleteMany({
-      where: { userId: session.user.id },
-    });
+  await prisma.sportPreference.deleteMany({
+    where: { userId: session.user.id },
+  });
 
-    // Create new ones
+  if (sports.length > 0) {
     await prisma.sportPreference.createMany({
       data: sports.map((s) => ({
         userId: session.user.id as string,
-        sportName: s.sportName,
+        sportName: s.sportName.trim(),
         skillLevel: s.skillLevel,
       })),
     });

@@ -5,7 +5,12 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function updateEventLocation(eventId: string, locationName: string) {
+export async function updateEventLocation(
+  eventId: string,
+  locationName: string,
+  locationLat?: number,
+  locationLng?: number
+) {
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.id) {
@@ -25,7 +30,11 @@ export async function updateEventLocation(eventId: string, locationName: string)
 
   await prisma.event.update({
     where: { id: eventId },
-    data: { locationName }
+    data: {
+      locationName,
+      ...(typeof locationLat === "number" ? { locationLat } : {}),
+      ...(typeof locationLng === "number" ? { locationLng } : {}),
+    }
   });
 
   revalidatePath(`/events/${eventId}`);

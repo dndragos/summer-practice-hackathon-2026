@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { pusherClient } from "@/lib/pusher";
-import { Box, Paper, Typography, TextField, IconButton, Avatar, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import { Box, Paper, Typography, TextField, IconButton, Avatar, List, ListItem, ListItemAvatar } from "@mui/material";
 import { Send as SendIcon } from "@mui/icons-material";
 
 interface User {
@@ -40,21 +39,37 @@ export default function Chat({ groupId, initialMessages, currentUserId }: ChatPr
   }, [messages]);
 
   useEffect(() => {
-    // Subscribe to pusher channel
-    const channelName = `group-${groupId}`;
-    pusherClient.subscribe(channelName);
+    if (!groupId) return;
 
-    pusherClient.bind("new-message", (message: Message) => {
-      setMessages((prev) => {
-        // Prevent duplicate messages
-        if (prev.find((m) => m.id === message.id)) return prev;
-        return [...prev, message];
-      });
-    });
+    let timerId: NodeJS.Timeout;
+
+    const refreshMessages = async () => {
+      try {
+        const res = await fetch(`/api/messages?groupId=${encodeURIComponent(groupId)}`, {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const serverMessages = (await res.json()) as Message[];
+        
+        // Only update if something changed (last message ID or length)
+        setMessages((prev) => {
+          if (prev.length === serverMessages.length && 
+              prev[prev.length - 1]?.id === serverMessages[serverMessages.length - 1]?.id) {
+            return prev;
+          }
+          return serverMessages;
+        });
+      } catch (error) {
+        console.error("Error refreshing messages:", error);
+      } finally {
+        timerId = setTimeout(refreshMessages, 3000);
+      }
+    };
+
+    refreshMessages();
 
     return () => {
-      pusherClient.unsubscribe(channelName);
-      pusherClient.unbind("new-message");
+      if (timerId) clearTimeout(timerId);
     };
   }, [groupId]);
 
@@ -75,6 +90,11 @@ export default function Chat({ groupId, initialMessages, currentUserId }: ChatPr
       if (!res.ok) {
         throw new Error("Failed to send message");
       }
+      const savedMessage = (await res.json()) as Message;
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === savedMessage.id)) return prev;
+        return [...prev, savedMessage];
+      });
     } catch (error) {
       console.error("Error sending message:", error);
     }

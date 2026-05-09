@@ -35,10 +35,10 @@ export default function NewEventPage() {
   return (
     <Container maxWidth="sm" sx={{ mt: 8, mb: 8 }}>
       <Paper elevation={3} sx={{ p: 5, borderRadius: 4 }}>
-        <Typography variant="h4" gutterBottom fontWeight="bold" textAlign="center">
+        <Typography variant="h4" gutterBottom fontWeight="bold" align="center">
           Create New Event
         </Typography>
-        <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ mb: 4 }}>
+        <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 4 }}>
           Organize your own match and lead your team!
         </Typography>
 
@@ -75,7 +75,7 @@ export default function NewEventPage() {
             label="Date and Time"
             name="scheduledTime"
             type="datetime-local"
-            InputLabelProps={{ shrink: true }}
+            slotProps={{ inputLabel: { shrink: true } }}
           />
 
           <TextField

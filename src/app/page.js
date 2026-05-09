@@ -1,66 +1,35 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { Box, Button, Chip, Container, Paper, Stack, Typography } from "@mui/material";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Container maxWidth="lg" sx={{ pb: 8 }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: { xs: 4, md: 8 },
+          borderRadius: 5,
+          background: "linear-gradient(135deg, #fff6ed 0%, #ffe5d0 100%)",
+        }}
+      >
+        <Stack spacing={3}>
+          <Box>
+            <Chip label="Sports Matching, Reimagined" color="secondary" />
+          </Box>
+          <Typography variant="h2">Find your team. Pick a venue. Just show up.</Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 700 }}>
+            ShowUp2Move helps you create a profile, set availability, get matched into events,
+            coordinate with your group, and keep everything simple.
+          </Typography>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+            <Button href="/dashboard" variant="contained" size="large">
+              Open Dashboard
+            </Button>
+            <Button href="/profile" variant="outlined" size="large">
+              Complete Profile
+            </Button>
+          </Stack>
+        </Stack>
+      </Paper>
+    </Container>
   );
 }
