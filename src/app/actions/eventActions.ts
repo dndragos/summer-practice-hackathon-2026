@@ -12,7 +12,7 @@ export async function updateEventLocation(
   locationLng?: number
 ) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
@@ -81,5 +81,40 @@ export async function createManualEvent(formData: FormData) {
 
   revalidatePath("/dashboard");
   return { id: event.id };
+}
+
+export async function exitEvent(eventId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  // Find all groups for this event where the user is a member or captain
+  const groups = await prisma.group.findMany({
+    where: { eventId },
+    include: { members: true },
+  });
+
+  for (const group of groups) {
+    // Remove user from group members
+    await prisma.groupMember.deleteMany({
+      where: {
+        groupId: group.id,
+        userId: session.user.id,
+      },
+    });
+
+    // If user is the captain, remove the captain assignment
+    if (group.captainId === session.user.id) {
+      await prisma.group.update({
+        where: { id: group.id },
+        data: { captainId: null },
+      });
+    }
+  }
+
+  revalidatePath("/my-events");
+  revalidatePath(`/events/${eventId}`);
+  return { success: true };
 }
 

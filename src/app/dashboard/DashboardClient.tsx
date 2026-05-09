@@ -6,6 +6,8 @@ import { toggleAvailability } from "@/app/actions/dashboardActions";
 import { generateMatches } from "@/app/actions/matchmakingActions";
 import { Button, Typography, Paper, Box, CircularProgress, Divider, Stack, Chip, Snackbar, Alert } from "@mui/material";
 import Link from "next/link";
+import EventsMap from "@/components/EventsMap";
+import { fakeEventsData } from "@/lib/fakeEventsData";
 
 type EventPreview = {
   id: string;
@@ -150,18 +152,36 @@ export default function DashboardClient({
         )}
       </Box>
 
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 4 }}>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           Hackathon Demo Controls
         </Typography>
-        <Button 
-          variant="outlined" 
-          color="secondary" 
+        <Button
+          variant="outlined"
+          color="secondary"
           onClick={handleMatchmaking}
           disabled={matchLoading}
+          sx={{ mr: 2 }}
         >
           {matchLoading ? <CircularProgress size={24} /> : "Trigger Matchmaking"}
         </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          component={Link}
+          href="/events-map"
+        >
+          View Events Map
+        </Button>
+      </Box>
+
+      {/* Events Map Preview */}
+      <Divider sx={{ my: 4 }} />
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: "bold" }}>
+          📍 Events Map Preview
+        </Typography>
+        <EventsMap events={fakeEventsData} />
       </Box>
       <Snackbar
         open={showSaved}

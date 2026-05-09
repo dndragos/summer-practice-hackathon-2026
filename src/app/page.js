@@ -24,6 +24,9 @@ export default function Home() {
             <Button href="/dashboard" variant="contained" size="large">
               Open Dashboard
             </Button>
+            <Button href="/events-map" variant="outlined" size="large">
+              View Events Map
+            </Button>
             <Button href="/profile" variant="outlined" size="large">
               Complete Profile
             </Button>

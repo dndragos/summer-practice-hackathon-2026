@@ -2,7 +2,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Container, Typography, Box, Paper, Button, Stack, Chip } from "@mui/material";
+import { Container, Typography, Box, Paper, Button, Stack } from "@mui/material";
+import MyEventsClient from "@/components/MyEventsClient";
 
 export default async function MyEventsPage() {
   const session = await getServerSession(authOptions);
@@ -39,27 +40,7 @@ export default async function MyEventsPage() {
             </Box>
           </Paper>
         ) : (
-          <Stack spacing={2}>
-            {events.map((event) => (
-              <Paper key={event.id} sx={{ p: 3 }}>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ justifyContent: "space-between" }}>
-                  <Box>
-                    <Typography variant="h6">{event.title}</Typography>
-                    <Typography color="text.secondary">{event.locationName}</Typography>
-                    <Typography color="text.secondary">
-                      {new Date(event.scheduledTime).toLocaleString()}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Chip label={event.sportName} color="secondary" />
-                    <Button href={`/events/${event.id}`} variant="contained">
-                      Open
-                    </Button>
-                  </Box>
-                </Stack>
-              </Paper>
-            ))}
-          </Stack>
+          <MyEventsClient events={events} />
         )}
       </Box>
     </Container>
